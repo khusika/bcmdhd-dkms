@@ -1,3 +1,9 @@
+bcmdhd (101.10.591.52.27-2) stable; urgency=medium
+
+  * Package for general architecture
+
+ -- Jianfeng Liu <liujianfeng1994@gmail.com>  Mon, 16 Sep 2024 02:40:58 +0800
+
 bcmdhd (101.10.591.52.27-1) jammy; urgency=medium
 
   * Initial release.
