@@ -52,7 +52,7 @@ jobs:
           echo "$(dpkg-parsechangelog -S Changes)" >> $GITHUB_ENV
           echo '```' >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-          if [[ -n "$(git tag -l "$version")" ]]
+          if [[ -z "$(git tag -l "$version")" ]]
           then
             echo "distro=UNRELEASED" >> $GITHUB_ENV
           else
