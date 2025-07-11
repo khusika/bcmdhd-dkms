@@ -459,7 +459,11 @@ int dhd_tcpack_suppress_set(dhd_pub_t *dhdp, uint8 mode)
 						tcpack_info_t *tcpack_info_tbl =
 							&tcpack_sup_module->tcpack_info_tbl[i];
 #ifndef TCPACK_SUPPRESS_HOLD_HRT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+						timer_delete(&tcpack_info_tbl->timer);
+#else
 						del_timer(&tcpack_info_tbl->timer);
+#endif
 #else
 						hrtimer_cancel(&tcpack_info_tbl->timer.timer);
 #endif /* TCPACK_SUPPRESS_HOLD_HRT */
@@ -558,7 +562,11 @@ dhd_tcpack_info_tbl_clean(dhd_pub_t *dhdp)
 	if (dhdp->tcpack_sup_mode == TCPACK_SUP_HOLD) {
 		for (i = 0; i < TCPACK_INFO_MAXNUM; i++) {
 #ifndef TCPACK_SUPPRESS_HOLD_HRT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&tcpack_sup_mod->tcpack_info_tbl[i].timer);
+#else
 			del_timer_sync(&tcpack_sup_mod->tcpack_info_tbl[i].timer);
+#endif
 #else
 			hrtimer_cancel(&tcpack_sup_mod->tcpack_info_tbl[i].timer.timer);
 #endif /* TCPACK_SUPPRESS_HOLD_HRT */
@@ -1343,7 +1351,11 @@ dhd_tcpack_hold(dhd_pub_t *dhdp, void *pkt, int ifidx)
 
 		if (!hold) {
 #ifndef TCPACK_SUPPRESS_HOLD_HRT
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&tcpack_info_tbl[i].timer);
+#else
 			del_timer_sync(&tcpack_info_tbl[i].timer);
+#endif
 #else
 			hrtimer_cancel(&tcpack_sup_mod->tcpack_info_tbl[i].timer.timer);
 #endif /* TCPACK_SUPPRESS_HOLD_HRT */

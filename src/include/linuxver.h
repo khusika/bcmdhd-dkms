@@ -407,9 +407,16 @@ extern void timer_cb_compat(struct timer_list *tl);
 #define timer_set_private(timer_compat, priv) (timer_compat)->arg = priv
 #define timer_expires(timer_compat) (timer_compat)->timer.expires
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+#define timer_delete(t) timer_delete(&((t)->timer))
+#ifndef timer_delete_sync
+#define timer_delete_sync(t) timer_delete_sync(&((t)->timer))
+#endif
+#else
 #define del_timer(t) del_timer(&((t)->timer))
 #ifndef del_timer_sync
 #define del_timer_sync(t) del_timer_sync(&((t)->timer))
+#endif
 #endif
 #define timer_pending(t) timer_pending(&((t)->timer))
 #define add_timer(t) add_timer(&((t)->timer))
@@ -487,8 +494,13 @@ static inline void tasklet_init(struct tasklet_struct *tasklet,
 
 #define tasklet_kill(tasklet)	{ do {} while (0); }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+/* 6.15.x introduced timer_delete_sync() */
+#define timer_delete_sync(timer) timer_delete(timer)
+#else
 /* 2.4.x introduced del_timer_sync() */
 #define del_timer_sync(timer) del_timer(timer)
+#endif
 
 #else
 

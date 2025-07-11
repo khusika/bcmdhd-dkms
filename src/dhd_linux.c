@@ -10166,7 +10166,11 @@ dhd_bus_start(dhd_pub_t *dhdp)
 		DHD_GENERAL_LOCK(&dhd->pub, flags);
 		dhd->wd_timer_valid = FALSE;
 		DHD_GENERAL_UNLOCK(&dhd->pub, flags);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&dhd->timer);
+#else
 		del_timer_sync(&dhd->timer);
+#endif
 
 #endif /* !BCMPCIE_OOB_HOST_WAKE */
 		DHD_STOP_RPM_TIMER(&dhd->pub);
@@ -10225,7 +10229,11 @@ dhd_bus_start(dhd_pub_t *dhdp)
 		DHD_GENERAL_LOCK(&dhd->pub, flags);
 		dhd->wd_timer_valid = FALSE;
 		DHD_GENERAL_UNLOCK(&dhd->pub, flags);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&dhd->timer);
+#else
 		del_timer_sync(&dhd->timer);
+#endif
 		DHD_ERROR(("%s failed bus is not ready\n", __FUNCTION__));
 		DHD_STOP_RPM_TIMER(&dhd->pub);
 #ifdef BCMSDIO
@@ -10248,7 +10256,11 @@ dhd_bus_start(dhd_pub_t *dhdp)
 		DHD_GENERAL_LOCK(&dhd->pub, flags);
 		dhd->wd_timer_valid = FALSE;
 		DHD_GENERAL_UNLOCK(&dhd->pub, flags);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&dhd->timer);
+#else
 		del_timer_sync(&dhd->timer);
+#endif
 		DHD_ERROR(("%s failed to sync with dongle\n", __FUNCTION__));
 		DHD_OS_WD_WAKE_UNLOCK(&dhd->pub);
 		return ret;
@@ -14341,7 +14353,11 @@ void dhd_detach(dhd_pub_t *dhdp)
 	dhd->wd_timer_valid = FALSE;
 	DHD_GENERAL_UNLOCK(&dhd->pub, flags);
 	if (timer_valid)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&dhd->timer);
+#else
 		del_timer_sync(&dhd->timer);
+#endif
 	DHD_STOP_RPM_TIMER(&dhd->pub);
 
 #ifdef BCMDBUS
@@ -15352,7 +15368,11 @@ dhd_os_wd_timer(void *bus, uint wdtick)
 	if (!wdtick && dhd->wd_timer_valid == TRUE) {
 		dhd->wd_timer_valid = FALSE;
 		DHD_GENERAL_UNLOCK(pub, flags);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&dhd->timer);
+#else
 		del_timer_sync(&dhd->timer);
+#endif
 #ifdef BCMSDIO
 		DHD_OS_WD_WAKE_UNLOCK(pub);
 #endif /* BCMSDIO */

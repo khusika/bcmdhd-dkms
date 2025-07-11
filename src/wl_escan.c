@@ -393,7 +393,11 @@ wl_escan_notify_complete(struct net_device *dev,
 		wl_escan_abort(dev, escan);
 
 	if (timer_pending(&escan->scan_timeout))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&escan->scan_timeout);
+#else
 		del_timer_sync(&escan->scan_timeout);
+#endif
 
 #if defined(ESCAN_RESULT_PATCH)
 	escan->bss_list = wl_escan_get_buf(escan);
@@ -837,7 +841,11 @@ static int
 wl_escan_reset(struct wl_escan_info *escan)
 {
 	if (timer_pending(&escan->scan_timeout))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&escan->scan_timeout);
+#else
 		del_timer_sync(&escan->scan_timeout);
+#endif
 	escan->escan_state = ESCAN_STATE_IDLE;
 
 	return 0;
@@ -1712,7 +1720,11 @@ wl_escan_deinit(struct net_device *dev, struct wl_escan_info *escan)
 {
 	ESCAN_TRACE(dev->name, "Enter\n");
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	timer_delete_sync(&escan->scan_timeout);
+#else
 	del_timer_sync(&escan->scan_timeout);
+#endif
 	escan->escan_state = ESCAN_STATE_DOWN;
 
 #if defined(RSSIAVG)
