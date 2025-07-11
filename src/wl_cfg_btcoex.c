@@ -338,7 +338,11 @@ static void wl_cfg80211_bt_handler(struct work_struct *work)
 
 	if (btcx_inf->timer_on) {
 		btcx_inf->timer_on = 0;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&btcx_inf->timer);
+#else
 		del_timer_sync(&btcx_inf->timer);
+#endif
 	}
 
 	switch (btcx_inf->bt_state) {
@@ -444,7 +448,11 @@ void wl_cfg80211_btcoex_kill_handler(void)
 
 	if (btcoex_info_loc->timer_on) {
 		btcoex_info_loc->timer_on = 0;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&btcoex_info_loc->timer);
+#else
 		del_timer_sync(&btcoex_info_loc->timer);
+#endif
 	}
 	cancel_work_sync(&btcoex_info_loc->work);
 	wl_cfg80211_btcoex_init_handler_status();
@@ -601,7 +609,11 @@ int wl_cfg80211_set_btcoex_dhcp(struct net_device *dev, dhd_pub_t *dhd, char *co
 		WL_TRACE(("disable BT DHCP Timer\n"));
 		if (btco_inf->timer_on) {
 			btco_inf->timer_on = 0;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&btco_inf->timer);
+#else
 			del_timer_sync(&btco_inf->timer);
+#endif
 
 			if (btco_inf->bt_state != BT_DHCP_IDLE) {
 			/* ANDREY: case when framework signals DHCP end before STM timeout */

@@ -24856,7 +24856,11 @@ typedef struct wl_mlo_emlsr_ctrl_v1 {
 typedef struct wl_mlo_mld_ap_op {
 	uint8	op_code;		/* WL_MLO_CMD_MLD_AP_OP_ADD/DEL */
 	uint8	link_id;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	uint16	timer_delete;		/* delete timer in units of TBTT */
+#else
 	uint16	del_timer;		/* delete timer in units of TBTT */
+#endif
 } wl_mlo_mld_ap_op_t;
 
 /* Current version for wlc_clm_power_limits_req_t structure and flags */

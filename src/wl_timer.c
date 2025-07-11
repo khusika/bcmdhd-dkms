@@ -550,7 +550,11 @@ wl_timer_dettach(dhd_pub_t *dhdp)
 
 	if (timer_params) {
 		if (timer_pending(&timer_params->timer))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&timer_params->timer);
+#else
 			del_timer_sync(&timer_params->timer);
+#endif
 		wl_timer_deinit_priv(timer_params);
 		kfree(timer_params);
 		dhdp->timer_params = NULL;
@@ -591,7 +595,11 @@ void
 wl_timer_mod(dhd_pub_t *dhd, timer_list_compat_t *timer, uint32 tmo_ms)
 {
 	if (timer_pending(timer))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(timer);
+#else
 		del_timer_sync(timer);
+#endif
 	if (tmo_ms)
 		mod_timer(timer, jiffies + msecs_to_jiffies(tmo_ms));
 }
@@ -606,6 +614,10 @@ void
 wl_timer_deregister(struct net_device *net, timer_list_compat_t *timer)
 {
 	if (timer_pending(timer))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(timer);
+#else
 		del_timer_sync(timer);
+#endif
 }
 #endif

@@ -576,7 +576,11 @@ dhd_dump_mod_pkt_timer(dhd_pub_t *dhdp, uint16 rsn)
 
 	pktcnts = (pkt_cnts_log_t *)(dhdp->pktcnts);
 	if (timer_pending(&pktcnts->pktcnt_timer)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&pktcnts->pktcnt_timer);
+#else
 		del_timer_sync(&pktcnts->pktcnt_timer);
+#endif
 	}
 
 	bzero(&pktcnts->arp_cnt, sizeof(pkt_cnt_t));
@@ -623,7 +627,11 @@ dhd_dump_pkt_deinit(dhd_pub_t *dhdp)
 
 	pktcnts = (pkt_cnts_log_t *)(dhdp->pktcnts);
 	pktcnts->enabled = FALSE;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	timer_delete_sync(&pktcnts->pktcnt_timer);
+#else
 	del_timer_sync(&pktcnts->pktcnt_timer);
+#endif
 	MFREE(dhdp->osh, dhdp->pktcnts, sizeof(pkt_cnts_log_t));
 	dhdp->pktcnts = NULL;
 }
@@ -640,7 +648,11 @@ dhd_dump_pkt_clear(dhd_pub_t *dhdp)
 
 	pktcnts = (pkt_cnts_log_t *)(dhdp->pktcnts);
 	pktcnts->enabled = FALSE;
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	timer_delete_sync(&pktcnts->pktcnt_timer);
+#else
 	del_timer_sync(&pktcnts->pktcnt_timer);
+#endif
 	pktcnts->reason = 0;
 	bzero(&pktcnts->arp_cnt, sizeof(pkt_cnt_t));
 	bzero(&pktcnts->dns_cnt, sizeof(pkt_cnt_t));

@@ -1504,7 +1504,11 @@ wl_cfgp2p_listen_complete(struct bcm_cfg80211 *cfg, bcm_struct_cfgdev *cfgdev,
 	if (wl_get_p2p_status(cfg, LISTEN_EXPIRED) == 0) {
 		wl_set_p2p_status(cfg, LISTEN_EXPIRED);
 		if (timer_pending(&cfg->p2p->listen_timer)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&cfg->p2p->listen_timer);
+#else
 			del_timer_sync(&cfg->p2p->listen_timer);
+#endif
 		}
 
 		if (cfg->afx_hdl->is_listen == TRUE &&
@@ -1615,7 +1619,11 @@ wl_cfgp2p_cancel_listen(struct bcm_cfg80211 *cfg, struct net_device *ndev,
 	 * the LISTEN state.
 	 */
 	if (timer_pending(&cfg->p2p->listen_timer)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&cfg->p2p->listen_timer);
+#else
 		del_timer_sync(&cfg->p2p->listen_timer);
+#endif
 		if (notify) {
 #if defined(WL_CFG80211_P2P_DEV_IF)
 			if (bcmcfg_to_p2p_wdev(cfg))

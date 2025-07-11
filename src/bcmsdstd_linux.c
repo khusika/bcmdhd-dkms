@@ -197,7 +197,11 @@ sdstd_3_osclean_tuning(sdioh_info_t *sd)
 	struct sdos_info *sdos = (struct sdos_info *)sd->sdos_info;
 	if (atomic_read(&sdos->timer_enab) == TRUE) {
 		/* disable timer if it was running */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&sdos->tuning_timer);
+#else
 		del_timer_sync(&sdos->tuning_timer);
+#endif
 		atomic_set(&sdos->timer_enab, FALSE);
 	}
 	tasklet_kill(&sdos->tuning_tasklet);
@@ -495,7 +499,11 @@ void sdstd_enable_disable_periodic_timer(sdioh_info_t *sd, uint val)
 		}
 	    if (val == SD_DHD_DISABLE_PERIODIC_TUNING) {
 			/* stop periodic timer */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		   timer_delete_sync(&sdos->tuning_timer);
+#else
 		   del_timer_sync(&sdos->tuning_timer);
+#endif
 		}
 }
 #endif /* debugging purpose */
